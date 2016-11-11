@@ -16,6 +16,7 @@ h2.title {
     background-color: #EEEEEE;
     border-radius: 5px;
     border: 1px solid #DDDDDD;
+    margin: 0 auto;
 }
 
 .helper {
@@ -45,4 +46,14 @@ h2.title {
 
 .initializing img {
     margin-top: -9px;
+}
+
+.available-memes {
+    padding-top: 30px;
+}
+
+.available-memes .meme-name {
+    text-transform: lowercase;
+    color: #8c8c8c;
+    text-align: center;
 }

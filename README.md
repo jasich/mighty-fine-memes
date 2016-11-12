@@ -34,3 +34,13 @@ To compile clojurescript to javascript:
 lein clean
 lein cljsbuild once min
 ```
+
+
+### SASS Compilation
+Using [lein-sassy](https://github.com/vladh/lein-sassy)
+
+To compile files once, use lein sass once.
+
+To watch files for changes, use lein sass watch.
+
+To remove generated files, run lein sass clean.

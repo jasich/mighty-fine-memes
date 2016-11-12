@@ -24,7 +24,10 @@
                    [com.cemerick/piggieback "0.2.1"]]
 
     :plugins      [[lein-figwheel "0.5.7"]
-                   [cider/cider-nrepl "0.13.0"]]
+                   [cider/cider-nrepl "0.13.0"]
+                   [lein-sassy "1.0.8"]]
+    :sass {:src "resources/app/scss"
+           :dst "resources/public/css/"}
     }}
 
   :cljsbuild

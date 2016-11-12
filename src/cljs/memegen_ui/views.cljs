@@ -1,42 +1,52 @@
 (ns memegen-ui.views
   (:require [re-frame.core :refer [subscribe dispatch]]))
 
-(defn meme-template-img [meme-link]
+
+;;
+;; Helpers
+(defn meme-template-img
+  "Creates an image link to a blank template image based on a meme templates URL"
+  [meme-link]
   (str (clojure.string/replace meme-link  "/api/templates" "") "/_/_.jpg"))
 
-(defn meme-template-view [meme]
-  (let [src (meme-template-img (:link meme))]
-    [:div.col-xs-3
-     [:div.meme-template
-      [:span.helper]
-      [:img {:src src
-             :alt (:name meme)}]]
-     [:div.meme-name (:name meme)]]))
-
-(defn row-key [meme-tuple]
+(defn row-key
+  "Creates a unique React key for a tuple of components"
+  [meme-tuple]
   (apply str (map :name meme-tuple)))
 
-(defn meme-template-selector []
-  (let [available-meme-templates (subscribe [:available-meme-templates])]
+
+;;
+;; Components
+(defn meme-view [meme]
+  (let [src (meme-template-img (:link meme))]
+    [:div.col-xs-3.meme-listing-view
+     [:div.meme-listing-view__meme
+      [:span.meme-listing-view__meme__helper]
+      [:img.meme-listing-view__meme__img {:src src
+             :alt (:name meme)}]]
+     [:div.meme-listing-view__name (:name meme)]]))
+
+(defn meme-listing []
+  (let [meme-templates (subscribe [:available-meme-templates])]
     (fn []
-      [:div.available-memes
-       (for [meme-tuple (partition 4 4 nil (sort-by :name @available-meme-templates))]
-         ^{:key (row-key meme-tuple)} [:div.row
+      [:div.meme-listing
+       (for [meme-tuple (partition 4 4 nil (sort-by :name @meme-templates))]
+         ^{:key (row-key meme-tuple)} [:div.row.meme-listing__meme-tuple
                                        (for [meme meme-tuple]
-                                         ^{:key (:name meme)} [meme-template-view meme])])])))
-(defn loading []
-  [:div.initializing
-   [:span "loading"]
-   [:img {:src "images/ellipsis.gif"}]])
+                                         ^{:key (:name meme)} [meme-view meme])])])))
+(defn loading-view []
+  [:div.loading-view
+   [:span.loading-view__message "loading"]
+   [:img.loading-view__spinner {:src "images/ellipsis.gif"}]])
 
 (defn top-panel []
   (let [ready? (subscribe [:initialized?])]
     (fn []
       (if-not @ready?
-        [loading]
-        [meme-template-selector]))))
+        [loading-view]
+        [meme-listing]))))
 
 (defn main-panel []
   [:div
-   [:h2.title "memegen.link"]
+   [:h2.brand "memegen.link"]
    [top-panel]])

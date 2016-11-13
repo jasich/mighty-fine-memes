@@ -2,4 +2,6 @@
 
 (def default-db
   {:initialized? false
-   :available-meme-templates []})
+   :filter-text ""
+   :available-meme-templates []
+   :filtered-meme-templates []})

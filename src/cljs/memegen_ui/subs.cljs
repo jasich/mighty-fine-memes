@@ -11,3 +11,13 @@
  :available-meme-templates
  (fn [db]
    (:available-meme-templates db)))
+
+(re-frame/reg-sub
+ :filtered-meme-templates
+ (fn [db]
+   (:filtered-meme-templates db)))
+
+(re-frame/reg-sub
+ :filter-text
+ (fn [db]
+   (:filter-text db)))

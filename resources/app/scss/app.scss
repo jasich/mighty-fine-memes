@@ -9,10 +9,15 @@ $dark-grey: #8C8C8C;
 
 body {
   padding: 8px;
+  padding-top: 18px;
 }
 
 .brand {
   color: $primary-color;
+  display: inline-block;
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.1;
 }
 
 

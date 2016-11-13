@@ -1,5 +1,6 @@
 (ns memegen-ui.events
   (:require [re-frame.core :as re-frame]
+            [clojure.string :as string]
             [ajax.core :refer [GET]]
             [memegen-ui.db :as db]
             [memegen-ui.config :as config]))
@@ -8,6 +9,18 @@
  :initialize-db
  (fn  [_ _]
    db/default-db))
+
+(re-frame/reg-event-db
+ :filter-text
+ (fn [db [_ value]]
+   (let [text (string/lower-case value)]
+     (if-not (empty? text)
+       (-> db
+           (assoc :filter-text text)
+           (assoc :filtered-meme-templates (filter #(string/includes? (string/lower-case (:name %)) text) (:available-meme-templates db))))
+       (-> db
+           (assoc :filter-text text)
+           (assoc :filtered-meme-templates (:available-meme-templates db)))))))
 
 (defn template-handler [response]
   (re-frame/dispatch [:process-templates-reponse response]))
@@ -44,4 +57,5 @@
      (-> db
          (assoc :loading? false)
          (assoc :initialized? true)
+         (assoc :filtered-meme-templates templates)
          (assoc :available-meme-templates templates)))))

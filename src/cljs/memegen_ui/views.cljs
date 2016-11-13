@@ -27,7 +27,7 @@
      [:div.meme-listing-view__name (:name meme)]]))
 
 (defn meme-listing []
-  (let [meme-templates (subscribe [:available-meme-templates])]
+  (let [meme-templates (subscribe [:filtered-meme-templates])]
     (fn []
       [:div.meme-listing
        (for [meme-tuple (partition 4 4 nil (sort-by :name @meme-templates))]
@@ -46,7 +46,19 @@
         [loading-view]
         [meme-listing]))))
 
+(defn filter-bar []
+  (let [filter-text (subscribe [:filter-text])]
+    (fn []
+      [:input.form-control {:type "text"
+                            :placeholder "Filter memes by name"
+                            :value @filter-text
+                            :on-change #(dispatch [:filter-text (-> % .-target .-value)])}])))
+
 (defn main-panel []
   [:div
-   [:h2.brand "memegen.link"]
+   [:div.row
+    [:div.col-xs-3
+     [:span.brand "memegen.link"]]
+    [:div.col-xs-9
+     [filter-bar]]]
    [top-panel]])

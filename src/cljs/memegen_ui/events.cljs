@@ -10,6 +10,19 @@
  (fn  [_ _]
    db/default-db))
 
+(defn filter-memes
+  [available-memes filter-text]
+  (filter (fn [meme]
+            (let [search-matches
+                  (reduce (fn [count meme-keyword]
+                            (if (string/includes? (string/lower-case meme-keyword) filter-text)
+                              (inc count)
+                              count))
+                          0
+                          (:keywords meme))]
+              (> search-matches 0)))
+          available-memes))
+
 (re-frame/reg-event-db
  :filter-text
  (fn [db [_ value]]
@@ -17,7 +30,7 @@
      (if-not (empty? text)
        (-> db
            (assoc :filter-text text)
-           (assoc :filtered-meme-templates (filter #(string/includes? (string/lower-case (:name %)) text) (:available-meme-templates db))))
+           (assoc :filtered-meme-templates (filter-memes (:available-meme-templates db) text)))
        (-> db
            (assoc :filter-text text)
            (assoc :filtered-meme-templates (:available-meme-templates db)))))))
@@ -36,18 +49,13 @@
          :error-handler error-handler})
    (assoc db :loading? true)))
 
-(def meme-template-keys
-  "The keywords used to define a meme-template "
-  [:name :link])
-
-(defn map-template-response
-  "Maps the incoming response hash-map that uses meme names for keys and links for
-  values into a hash-map that uses the keywords in `meme-template-keys` for keys."
-  [response]
-  (map (fn [key-value-pair]
-         (reduce (fn [mapped-template [key value]] (assoc mapped-template key value))
-                 {}
-                 (map vector meme-template-keys key-value-pair)))
+(defn map-template-response [response]
+  (map (fn [search-item]
+         (let [template (get search-item "template")]
+           (reduce (fn [mapped-template [key value]]
+                     (assoc mapped-template (keyword key) value))
+                   {}
+                   template)))
        response))
 
 (re-frame/reg-event-db

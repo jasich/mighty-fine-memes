@@ -4,11 +4,6 @@
 
 ;;
 ;; Helpers
-(defn meme-template-img
-  "Creates an image link to a blank template image based on a meme templates URL"
-  [meme-link]
-  (str (clojure.string/replace meme-link  "/api/templates" "") "/_/_.jpg"))
-
 (defn row-key
   "Creates a unique React key for a tuple of components"
   [meme-tuple]
@@ -18,13 +13,12 @@
 ;;
 ;; Components
 (defn meme-view [meme]
-  (let [src (meme-template-img (:link meme))]
-    [:div.col-xs-3.meme-listing-view
-     [:div.meme-listing-view__meme
-      [:span.meme-listing-view__meme__helper]
-      [:img.meme-listing-view__meme__img {:src src
-             :alt (:name meme)}]]
-     [:div.meme-listing-view__name (:name meme)]]))
+  [:div.col-xs-3.meme-listing-view
+   [:div.meme-listing-view__meme
+    [:span.meme-listing-view__meme__helper]
+    [:img.meme-listing-view__meme__img {:src (:blank meme)
+                                        :alt (:name meme)}]]
+   [:div.meme-listing-view__name (:name meme)]])
 
 (defn meme-listing []
   (let [meme-templates (subscribe [:filtered-meme-templates])]

@@ -10,30 +10,31 @@
  (fn  [_ _]
    db/default-db))
 
-(defn filter-memes
-  [available-memes filter-text]
-  (filter (fn [meme]
-            (let [search-matches
-                  (reduce (fn [count meme-keyword]
-                            (if (string/includes? (string/lower-case meme-keyword) filter-text)
+(defn count-keyword-matches [keywords filter-text]
+  (reduce (fn [count meme-keyword]
+            (if (string/includes? (string/lower-case meme-keyword) filter-text)
                               (inc count)
                               count))
-                          0
-                          (:keywords meme))]
-              (> search-matches 0)))
-          available-memes))
+          0
+          keywords))
+
+(defn filter-memes [available-memes filter-text]
+  (let [text (string/lower-case filter-text)]
+    (if-not (empty? text)
+      (filter (fn [meme]
+                (let [keyword-matches (count-keyword-matches (:keywords meme) text)]
+                  (> keyword-matches 0)))
+              available-memes)
+      available-memes)))
 
 (re-frame/reg-event-db
  :filter-text
  (fn [db [_ value]]
-   (let [text (string/lower-case value)]
-     (if-not (empty? text)
-       (-> db
-           (assoc :filter-text text)
-           (assoc :filtered-meme-templates (filter-memes (:available-meme-templates db) text)))
-       (-> db
-           (assoc :filter-text text)
-           (assoc :filtered-meme-templates (:available-meme-templates db)))))))
+   (let [available-memes (:available-meme-templates db)
+         filtered-memes (filter-memes available-memes value)]
+     (-> db
+         (assoc :filter-text value)
+         (assoc :filtered-meme-templates filtered-memes)))))
 
 (defn template-handler [response]
   (re-frame/dispatch [:process-templates-reponse response]))

@@ -24,7 +24,7 @@
   (let [meme-templates (subscribe [:filtered-meme-templates])]
     (fn []
       [:div.meme-listing
-       (for [meme-tuple (partition 4 4 nil (sort-by :name @meme-templates))]
+       (for [meme-tuple (partition 4 4 nil @meme-templates)]
          ^{:key (row-key meme-tuple)} [:div.row.meme-listing__meme-tuple
                                        (for [meme meme-tuple]
                                          ^{:key (:name meme)} [meme-view meme])])])))

@@ -10,31 +10,49 @@
  (fn  [_ _]
    db/default-db))
 
-(defn count-keyword-matches [keywords filter-text]
-  (reduce (fn [count meme-keyword]
-            (if (string/includes? (string/lower-case meme-keyword) filter-text)
-                              (inc count)
-                              count))
-          0
-          keywords))
+(defn count-keyword-matches
+  "Counts how many times each word in the filter text appears in
+   the keywords for a meme"
+  [keywords filter-text]
+  (let [filter-words (map string/lower-case  (string/split filter-text #"\s"))
+        lower-keywords (map string/lower-case keywords)]
+    (reduce (fn [filter-count filter-word]
+              (+ filter-count (reduce (fn [keyword-count keyword]
+                           (if (string/includes? keyword filter-word)
+                             (inc keyword-count)
+                             keyword-count))
+                         0
+                         lower-keywords)))
+            0
+            filter-words)))
+
+(defn rank-memes [memes filter-text]
+  (map (fn [meme]
+         (assoc meme :rank (count-keyword-matches (:keywords meme) filter-text)))
+       memes))
 
 (defn filter-memes [available-memes filter-text]
-  (let [text (string/lower-case filter-text)]
-    (if-not (empty? text)
-      (filter (fn [meme]
-                (let [keyword-matches (count-keyword-matches (:keywords meme) text)]
-                  (> keyword-matches 0)))
-              available-memes)
-      available-memes)))
+  (let [text (string/lower-case filter-text)
+        ranked-memes (rank-memes available-memes text)
+        total-matches (reduce (fn [total item] (+ total (:rank item))) 0 ranked-memes)]
+    (if (or (> total-matches 0) (not (empty? filter-text)))
+      (filter #(> (:rank %) 0) ranked-memes)
+      ranked-memes)))
+
+(defn sort-memes [memes filtered?]
+  (if filtered?
+    (reverse (sort-by :rank memes))
+    (sort-by :name memes)))
 
 (re-frame/reg-event-db
  :filter-text
- (fn [db [_ value]]
+ (fn [db [_ filter-text]]
    (let [available-memes (:available-meme-templates db)
-         filtered-memes (filter-memes available-memes value)]
+         filtered-memes (filter-memes available-memes filter-text)
+         sorted-filtered-memes (sort-memes filtered-memes (not (empty? filter-text)))]
      (-> db
-         (assoc :filter-text value)
-         (assoc :filtered-meme-templates filtered-memes)))))
+         (assoc :filter-text filter-text)
+         (assoc :filtered-meme-templates sorted-filtered-memes)))))
 
 (defn template-handler [response]
   (re-frame/dispatch [:process-templates-reponse response]))

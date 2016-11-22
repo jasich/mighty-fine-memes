@@ -3,4 +3,4 @@
 (def debug?
   ^boolean js/goog.DEBUG)
 
-(def api-url "https://memegen.link/api/search/")
+(def api-search-url "https://memegen.link/api/search/")

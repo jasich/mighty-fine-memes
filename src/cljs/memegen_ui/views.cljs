@@ -33,12 +33,19 @@
    [:span.loading-view__message "loading"]
    [:img.loading-view__spinner {:src "images/ellipsis.gif"}]])
 
+(defn error-view []
+  [:div.error-view
+   [:span.error-view__message "An error has occurred :("]])
+
 (defn top-panel []
-  (let [ready? (subscribe [:initialized?])]
+  (let [ready? (subscribe [:initialized?])
+        had-error? (subscribe [:had-error?])]
     (fn []
-      (if-not @ready?
-        [loading-view]
-        [meme-listing]))))
+      (if @had-error?
+        [error-view]
+        (if-not @ready?
+          [loading-view]
+          [meme-listing])))))
 
 (defn filter-bar []
   (let [filter-text (subscribe [:filter-text])]
@@ -46,7 +53,7 @@
       [:input.form-control {:type "text"
                             :placeholder "Filter memes by name"
                             :value @filter-text
-                            :on-change #(dispatch [:filter-text (-> % .-target .-value)])}])))
+                            :on-change #(dispatch [:filter-text-updated (-> % .-target .-value)])}])))
 
 (defn main-panel []
   [:div

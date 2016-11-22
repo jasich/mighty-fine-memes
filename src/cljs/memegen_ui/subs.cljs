@@ -8,6 +8,11 @@
    (:initialized? db)))
 
 (re-frame/reg-sub
+ :had-error?
+ (fn [db]
+   (:had-error? db)))
+
+(re-frame/reg-sub
  :available-meme-templates
  (fn [db]
    (:available-meme-templates db)))

@@ -30,6 +30,21 @@ body {
   line-height: 1.1;
 }
 
+.error-view {
+  height: 200px;
+  padding-top: 20px;
+  text-align: center;
+  line-height: 200px;
+}
+
+.error-view__message {
+  font-size: 30px;
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 500;
+  line-height: 1.1;
+}
+
 .loading-view__spinner {
   margin-top: -9px;
 }

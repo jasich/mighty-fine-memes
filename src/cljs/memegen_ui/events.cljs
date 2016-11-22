@@ -5,6 +5,18 @@
             [memegen-ui.db :as db]
             [memegen-ui.config :as config]))
 
+(defonce timeouts
+  (atom {}))
+
+(re-frame/reg-fx :dispatch-debounce
+                 (fn [[id event-vec n]]
+                   (js/clearTimeout (@timeouts id))
+                   (swap! timeouts assoc id
+                          (js/setTimeout (fn []
+                                           (re-frame/dispatch event-vec)
+                                           (swap! timeouts dissoc id))
+                                         n))))
+
 (re-frame/reg-event-db
  :initialize-db
  (fn  [_ _]
@@ -14,7 +26,7 @@
   "Counts how many times each word in the filter text appears in
    the keywords for a meme"
   [keywords filter-text]
-  (let [filter-words (map string/lower-case  (string/split filter-text #"\s"))
+  (let [filter-words (map string/lower-case (string/split filter-text #"\s"))
         lower-keywords (map string/lower-case keywords)]
     (reduce (fn [filter-count filter-word]
               (+ filter-count (reduce (fn [keyword-count keyword]
@@ -45,14 +57,26 @@
     (sort-by :name memes)))
 
 (re-frame/reg-event-db
+ :do-filter
+  (fn [db [_ filter-text]]
+    (let [available-memes (:available-meme-templates db)
+          filtered-memes (filter-memes available-memes filter-text)
+          sorted-filtered-memes (sort-memes filtered-memes (not (empty? filter-text)))]
+      (-> db
+          (assoc :filter-text filter-text)
+          (assoc :filtered-meme-templates sorted-filtered-memes)))))
+
+(re-frame/reg-event-fx
+ :filter-text-updated
+ (fn [_ [_ filter-text]]
+   {:dispatch-debounce [::filter [:do-filter filter-text] 250]}))
+
+(re-frame/reg-event-db
  :filter-text
  (fn [db [_ filter-text]]
-   (let [available-memes (:available-meme-templates db)
-         filtered-memes (filter-memes available-memes filter-text)
-         sorted-filtered-memes (sort-memes filtered-memes (not (empty? filter-text)))]
-     (-> db
-         (assoc :filter-text filter-text)
-         (assoc :filtered-meme-templates sorted-filtered-memes)))))
+   ;; dispatch please
+   (re-frame/dispatch [:filter-text-updated filter-text])
+   (-> db (assoc :filter-text filter-text))))
 
 (defn template-handler [response]
   (re-frame/dispatch [:process-templates-reponse response]))

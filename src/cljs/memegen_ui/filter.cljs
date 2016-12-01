@@ -30,11 +30,12 @@
   "Filters memes given the filter-text"
   [available-memes filter-text]
   (let [text (string/lower-case filter-text)
+        should-filter (not (empty? filter-text))
         ranked-memes (rank-memes available-memes text)
-        total-matches (reduce (fn [total item] (+ total (:rank item))) 0 ranked-memes)]
-    (if (or (> total-matches 0) (not (empty? filter-text)))
-      (filter #(> (:rank %) 0) ranked-memes)
-      ranked-memes)))
+        sorted-memes (sort-memes ranked-memes)]
+    (if should-filter
+      (filter #(> (:rank %) 0) sorted-memes)
+      sorted-memes)))
 
 (defn sort-memes [memes]
   "Sorts memes by :rank if ranked, else by :name"

@@ -36,11 +36,10 @@
  :filter-memes
   (fn [db [_ filter-text]]
     (let [available-memes (:available-meme-templates db)
-          filtered-memes (filter/filter-memes available-memes filter-text)
-          sorted-filtered-memes (filter/sort-memes filtered-memes)]
+          filtered-memes (filter/filter-memes available-memes filter-text)]
       (-> db
           (assoc :filter-text filter-text)
-          (assoc :filtered-meme-templates sorted-filtered-memes)))))
+          (assoc :filtered-meme-templates filtered-memes)))))
 
 (re-frame/reg-event-db
  :filter-text-updated
@@ -80,12 +79,13 @@
 (re-frame/reg-event-db
  :process-templates-reponse
  (fn [db [_ response]]
-   (let [templates (format-api-search-response (js->clj response))]
+   (let [templates (format-api-search-response (js->clj response))
+         memes (filter/filter-memes templates "")]
      (-> db
          (assoc :loading? false)
          (assoc :initialized? true)
-         (assoc :filtered-meme-templates (filter/sort-memes templates))
-         (assoc :available-meme-templates (filter/sort-memes templates))))))
+         (assoc :filtered-meme-templates memes)
+         (assoc :available-meme-templates memes)))))
 
 (re-frame/reg-event-db
  :api-error

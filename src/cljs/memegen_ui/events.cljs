@@ -1,9 +1,9 @@
 (ns memegen-ui.events
   (:require [re-frame.core :as re-frame]
             [ajax.core :refer [GET]]
-            [memegen-ui.db :as db]
             [memegen-ui.config :as config]
-            [memegen-ui.filter :as filter]))
+            [memegen-ui.db :as db]
+            [memegen-ui.search :refer [search]]))
 
 (defonce timeouts
   (atom {}))
@@ -36,7 +36,7 @@
  :filter-memes
   (fn [db [_ filter-text]]
     (let [available-memes (:available-meme-templates db)
-          filtered-memes (filter/filter-memes available-memes filter-text)]
+          filtered-memes (search filter-text available-memes)]
       (-> db
           (assoc :filter-text filter-text)
           (assoc :filtered-meme-templates filtered-memes)))))
@@ -80,12 +80,12 @@
  :process-templates-reponse
  (fn [db [_ response]]
    (let [templates (format-api-search-response (js->clj response))
-         memes (filter/filter-memes templates "")]
+         memes (search "" templates)]
      (-> db
          (assoc :loading? false)
          (assoc :initialized? true)
          (assoc :filtered-meme-templates memes)
-         (assoc :available-meme-templates memes)))))
+         (assoc :available-meme-templates templates)))))
 
 (re-frame/reg-event-db
  :api-error
@@ -94,3 +94,16 @@
        (assoc :had-error? true)
        (assoc :loading? false)
        (assoc :initialized? false))))
+
+;;; Test row implementation
+;; [{:row-index 0
+;;   :memes [{
+;;            :name "foo"
+;;            :rank 1
+;;            :selected true } ...]}
+;;  {:row-index 1
+;;   :selected true
+;;   :meme {
+;;            :name "foo"
+;;            :rank 1
+;;            :selected true }}]

@@ -1,4 +1,4 @@
-(ns memegen-ui.filter
+(ns memegen-ui.search
   (:require [clojure.string :as string]))
 
 (defn count-keyword-matches
@@ -19,26 +19,39 @@
 
 (defn rank-memes
   "Add a meme ranking to each meme based on the given filter text"
-  [memes filter-text]
+  [filter-text memes]
   (map (fn [meme]
          (if (empty? filter-text)
            (assoc meme :rank 0)
            (assoc meme :rank (count-keyword-matches (:keywords meme) filter-text))))
        memes))
 
-(defn filter-memes
-  "Filters memes given the filter-text"
-  [available-memes filter-text]
-  (let [text (string/lower-case filter-text)
-        should-filter (not (empty? filter-text))
-        ranked-memes (rank-memes available-memes text)
-        sorted-memes (sort-memes ranked-memes)]
-    (if should-filter
-      (filter #(> (:rank %) 0) sorted-memes)
-      sorted-memes)))
-
-(defn sort-memes [memes]
+(defn sort-memes
   "Sorts memes by :rank if ranked, else by :name"
+  [memes]
   (if (some #(> (:rank %) 0) memes)
     (reverse (sort-by :rank (sort-by :name memes)))
     (sort-by :name memes)))
+
+(defn rowify
+  "Places the memes into row structures"
+  [memes]
+  (let [tuples (partition 4 4 nil memes)]
+    (map-indexed (fn [index item]
+                   (assoc {} :row-index index :memes item))
+                 tuples)))
+
+(defn filter-by-rank
+  "Filters memes given :rank"
+  [memes]
+  (filter #(> (:rank %) 0) memes))
+
+(defn search
+  [filter-text memes]
+  (let [text (string/lower-case filter-text)
+        filter-memes (if (empty? text) identity filter-by-rank)]
+    (->> memes
+         (rank-memes text)
+         (filter-memes)
+         (sort-memes)
+         (rowify))))

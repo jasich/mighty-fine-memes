@@ -3,14 +3,6 @@
 
 
 ;;
-;; Helpers
-(defn row-key
-  "Creates a unique React key for a tuple of components"
-  [meme-tuple]
-  (apply str (map :name meme-tuple)))
-
-
-;;
 ;; Components
 (defn meme-view [meme]
   [:div.col-xs-3.meme-listing-view
@@ -21,13 +13,15 @@
    [:div.meme-listing-view__name (:name meme)]])
 
 (defn meme-listing []
-  (let [meme-templates (subscribe [:filtered-meme-templates])]
+  (let [meme-rows (subscribe [:filtered-meme-templates])]
     (fn []
       [:div.meme-listing
-       (for [meme-tuple (partition 4 4 nil @meme-templates)]
-         ^{:key (row-key meme-tuple)} [:div.row.meme-listing__meme-tuple
-                                       (for [meme meme-tuple]
-                                         ^{:key (:name meme)} [meme-view meme])])])))
+       (for [meme-row @meme-rows]
+         ^{:key (str "row-" (:row-index meme-row))}
+         [:div.row.meme-listing__meme-tuple
+          (for [meme (:memes meme-row)]
+            ^{:key (:name meme)} [meme-view meme])])])))
+
 (defn loading-view []
   [:div.loading-view
    [:span.loading-view__message "loading"]

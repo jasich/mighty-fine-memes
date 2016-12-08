@@ -5,22 +5,46 @@
 ;;
 ;; Components
 (defn meme-view [meme]
-  [:div.col-xs-3.meme-listing-view
+  [:div.col-xs-3.meme-listing-view { :on-click #(dispatch [:meme-selected meme]) }
    [:div.meme-listing-view__meme
     [:span.meme-listing-view__meme__helper]
     [:img.meme-listing-view__meme__img {:src (:blank meme)
                                         :alt (:name meme)}]]
    [:div.meme-listing-view__name (:name meme)]])
 
+(defn meme-editor [meme]
+  [:div.meme-editor
+   [:div.col-xs-5
+    [:div.meme-editor__view
+     [:span.meme-editor__view__helper]
+     [:img.meme-editor__view__image {:src (:blank meme)
+                                                     :alt (:name meme)}]]]
+   [:div.col-xs-7
+    [:form
+     [:div.form-group
+      [:label "Top Text"]
+      [:input.form-control]]
+     [:div.form-group
+      [:label "Bottom Text"]
+      [:input.form-control]]
+     [:button.btn.btn-default "Do It!"]]]])
+
+(defn meme-row-view [meme-row]
+  (if (:selected meme-row)
+    [:div.row.meme-listing__selected-row
+     [:div.pull-right.close {:on-click #(dispatch [:selection-closed])} "x"]
+     [meme-editor (:meme meme-row)]]
+    ^{:key (str "row-" (:row-index meme-row))}
+    [:div.row.meme-listing__meme-tuple
+     (for [meme (:memes meme-row)]
+       ^{:key (:name meme)} [meme-view meme])]))
+
 (defn meme-listing []
   (let [meme-rows (subscribe [:filtered-meme-templates])]
     (fn []
       [:div.meme-listing
        (for [meme-row @meme-rows]
-         ^{:key (str "row-" (:row-index meme-row))}
-         [:div.row.meme-listing__meme-tuple
-          (for [meme (:memes meme-row)]
-            ^{:key (:name meme)} [meme-view meme])])])))
+         (meme-row-view meme-row))])))
 
 (defn loading-view []
   [:div.loading-view

@@ -3,7 +3,8 @@
             [ajax.core :refer [GET]]
             [memegen-ui.config :as config]
             [memegen-ui.db :as db]
-            [memegen-ui.search :refer [search]]))
+            [memegen-ui.search :refer [search]]
+            [memegen-ui.rows :as rows]))
 
 (defonce timeouts
   (atom {}))
@@ -95,15 +96,18 @@
        (assoc :loading? false)
        (assoc :initialized? false))))
 
-;;; Test row implementation
-;; [{:row-index 0
-;;   :memes [{
-;;            :name "foo"
-;;            :rank 1
-;;            :selected true } ...]}
-;;  {:row-index 1
-;;   :selected true
-;;   :meme {
-;;            :name "foo"
-;;            :rank 1
-;;            :selected true }}]
+(re-frame/reg-event-db
+ :meme-selected
+ (fn [db [_ meme]]
+   (let [memes (vec (rows/remove-selected-row (:filtered-meme-templates db)))
+         clicked-index (rows/row-index-of-meme meme memes)
+         new-row-index (inc clicked-index)
+         new-row (rows/create-selected-row new-row-index meme)]
+     (assoc db
+            :filtered-meme-templates
+            (rows/insert-row new-row new-row-index memes)))))
+
+(re-frame/reg-event-db
+ :selection-closed
+ (fn [db _]
+   (assoc db :filtered-meme-templates (rows/remove-selected-row (:filtered-meme-templates db)))))

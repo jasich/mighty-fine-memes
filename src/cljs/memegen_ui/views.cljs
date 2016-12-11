@@ -5,7 +5,8 @@
 ;;
 ;; Components
 (defn meme-view [meme]
-  [:div.col-xs-3.meme-listing-view { :on-click #(dispatch [:meme-selected meme]) }
+  [:div.col-xs-3.meme-listing-view {:id (:name meme)
+                                    :on-click #(dispatch [:meme-selected meme]) }
    [:div.meme-listing-view__meme
     [:span.meme-listing-view__meme__helper]
     [:img.meme-listing-view__meme__img {:src (:blank meme)
@@ -23,10 +24,11 @@
     [:form
      [:div.form-group
       [:label "Top Text"]
-      [:input.form-control]]
+      [:input.form-control {:id "top-text"
+                            :autoFocus true}]]
      [:div.form-group
       [:label "Bottom Text"]
-      [:input.form-control]]
+      [:input.form-control {:id "bottom-text"}]]
      [:button.btn.btn-default "Do It!"]]]])
 
 (defn meme-row-view [meme-row]

@@ -4,7 +4,8 @@
             [memegen-ui.config :as config]
             [memegen-ui.db :as db]
             [memegen-ui.search :refer [search]]
-            [memegen-ui.rows :as rows]))
+            [memegen-ui.rows :as rows]
+            [memegen-ui.ux :as ux]))
 
 (defonce timeouts
   (atom {}))
@@ -25,7 +26,6 @@
  :update-filtered-memes
  (fn [_ [_ filter-text]]
    {:dispatch-debounce [::filter [:filter-memes filter-text] 250]}))
-
 
 ;; db events
 (re-frame/reg-event-db
@@ -103,6 +103,7 @@
          clicked-index (rows/row-index-of-meme meme memes)
          new-row-index (inc clicked-index)
          new-row (rows/create-selected-row new-row-index meme)]
+     (ux/scroll-to-id (:name meme))
      (assoc db
             :filtered-meme-templates
             (rows/insert-row new-row new-row-index memes)))))

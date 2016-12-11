@@ -1,5 +1,5 @@
 ;; Based on https://github.com/GabrielDelepine/smooth-scroll/blob/main/smooth-scroll.js
-(ns memegen-ui.scroll)
+(ns memegen-ui.ux)
 
 (def speed 500)
 (def moving-frequency 15)

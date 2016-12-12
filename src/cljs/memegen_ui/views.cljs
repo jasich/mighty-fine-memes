@@ -3,31 +3,51 @@
 
 
 ;;
-;; Helpers
-(defn row-key
-  "Creates a unique React key for a tuple of components"
-  [meme-tuple]
-  (apply str (map :name meme-tuple)))
-
-
-;;
 ;; Components
 (defn meme-view [meme]
-  [:div.col-xs-3.meme-listing-view
+  [:div.col-xs-3.meme-listing-view {:id (:name meme)
+                                    :on-click #(dispatch [:meme-selected meme]) }
    [:div.meme-listing-view__meme
     [:span.meme-listing-view__meme__helper]
     [:img.meme-listing-view__meme__img {:src (:blank meme)
                                         :alt (:name meme)}]]
    [:div.meme-listing-view__name (:name meme)]])
 
+(defn meme-editor [meme]
+  [:div.meme-editor
+   [:div.col-xs-5
+    [:div.meme-editor__view
+     [:span.meme-editor__view__helper]
+     [:img.meme-editor__view__image {:src (:blank meme)
+                                                     :alt (:name meme)}]]]
+   [:div.col-xs-7
+    [:form
+     [:div.form-group
+      [:label "Top Text"]
+      [:input.form-control {:id "top-text"
+                            :autoFocus true}]]
+     [:div.form-group
+      [:label "Bottom Text"]
+      [:input.form-control {:id "bottom-text"}]]
+     [:button.btn.btn-default "Do It!"]]]])
+
+(defn meme-row-view [meme-row]
+  (if (:selected meme-row)
+    [:div.row.meme-listing__selected-row
+     [:div.pull-right.close {:on-click #(dispatch [:selection-closed])} "x"]
+     [meme-editor (:meme meme-row)]]
+    ^{:key (str "row-" (:row-index meme-row))}
+    [:div.row.meme-listing__meme-tuple
+     (for [meme (:memes meme-row)]
+       ^{:key (:name meme)} [meme-view meme])]))
+
 (defn meme-listing []
-  (let [meme-templates (subscribe [:filtered-meme-templates])]
+  (let [meme-rows (subscribe [:filtered-meme-templates])]
     (fn []
       [:div.meme-listing
-       (for [meme-tuple (partition 4 4 nil @meme-templates)]
-         ^{:key (row-key meme-tuple)} [:div.row.meme-listing__meme-tuple
-                                       (for [meme meme-tuple]
-                                         ^{:key (:name meme)} [meme-view meme])])])))
+       (for [meme-row @meme-rows]
+         (meme-row-view meme-row))])))
+
 (defn loading-view []
   [:div.loading-view
    [:span.loading-view__message "loading"]

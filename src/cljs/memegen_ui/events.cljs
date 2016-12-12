@@ -1,9 +1,11 @@
 (ns memegen-ui.events
   (:require [re-frame.core :as re-frame]
             [ajax.core :refer [GET]]
-            [memegen-ui.db :as db]
             [memegen-ui.config :as config]
-            [memegen-ui.filter :as filter]))
+            [memegen-ui.db :as db]
+            [memegen-ui.search :refer [search]]
+            [memegen-ui.rows :as rows]
+            [memegen-ui.ux :as ux]))
 
 (defonce timeouts
   (atom {}))
@@ -25,7 +27,6 @@
  (fn [_ [_ filter-text]]
    {:dispatch-debounce [::filter [:filter-memes filter-text] 250]}))
 
-
 ;; db events
 (re-frame/reg-event-db
  :initialize-db
@@ -36,11 +37,10 @@
  :filter-memes
   (fn [db [_ filter-text]]
     (let [available-memes (:available-meme-templates db)
-          filtered-memes (filter/filter-memes available-memes filter-text)
-          sorted-filtered-memes (filter/sort-memes filtered-memes)]
+          filtered-memes (search filter-text available-memes)]
       (-> db
           (assoc :filter-text filter-text)
-          (assoc :filtered-meme-templates sorted-filtered-memes)))))
+          (assoc :filtered-meme-templates filtered-memes)))))
 
 (re-frame/reg-event-db
  :filter-text-updated
@@ -80,12 +80,13 @@
 (re-frame/reg-event-db
  :process-templates-reponse
  (fn [db [_ response]]
-   (let [templates (format-api-search-response (js->clj response))]
+   (let [templates (format-api-search-response (js->clj response))
+         memes (search "" templates)]
      (-> db
          (assoc :loading? false)
          (assoc :initialized? true)
-         (assoc :filtered-meme-templates (filter/sort-memes templates))
-         (assoc :available-meme-templates (filter/sort-memes templates))))))
+         (assoc :filtered-meme-templates memes)
+         (assoc :available-meme-templates templates)))))
 
 (re-frame/reg-event-db
  :api-error
@@ -94,3 +95,20 @@
        (assoc :had-error? true)
        (assoc :loading? false)
        (assoc :initialized? false))))
+
+(re-frame/reg-event-db
+ :meme-selected
+ (fn [db [_ meme]]
+   (let [memes (vec (rows/remove-selected-row (:filtered-meme-templates db)))
+         clicked-index (rows/row-index-of-meme meme memes)
+         new-row-index (inc clicked-index)
+         new-row (rows/create-selected-row new-row-index meme)]
+     (ux/scroll-to-id (:name meme))
+     (assoc db
+            :filtered-meme-templates
+            (rows/insert-row new-row new-row-index memes)))))
+
+(re-frame/reg-event-db
+ :selection-closed
+ (fn [db _]
+   (assoc db :filtered-meme-templates (rows/remove-selected-row (:filtered-meme-templates db)))))

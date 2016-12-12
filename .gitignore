@@ -4,3 +4,5 @@
 /resources/public/js/compiled
 /resources/public/css
 out
+.lein-repl-history
+.nrepl-port

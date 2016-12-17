@@ -90,8 +90,8 @@
 (defn main-panel []
   [:div
    [:div.row
-    [:div.col-xs-3
-     [:span.brand "memegen.link"]]
-    [:div.col-xs-9
+    [:div.col-xs-4
+     [:span.brand "Mighty Fine Memes"]]
+    [:div.col-xs-8
      [filter-bar]]]
    [top-panel]])

@@ -1,6 +1,7 @@
 (ns memegen-ui.subs
     (:require-macros [reagent.ratom :refer [reaction]])
-    (:require [re-frame.core :as re-frame]))
+    (:require [re-frame.core :as re-frame]
+              [memegen-ui.rows :as rows]))
 
 (re-frame/reg-sub
  :initialized?
@@ -26,3 +27,18 @@
  :filter-text
  (fn [db]
    (:filter-text db)))
+
+(re-frame/reg-sub
+ :top-text
+ (fn [db]
+   (:top-text db)))
+
+(re-frame/reg-sub
+ :bottom-text
+ (fn [db]
+   (:bottom-text db)))
+
+(re-frame/reg-sub
+ :meme-url
+ (fn [db]
+   (:meme-url db)))

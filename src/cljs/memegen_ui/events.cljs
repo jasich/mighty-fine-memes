@@ -1,5 +1,6 @@
 (ns memegen-ui.events
   (:require [re-frame.core :as re-frame]
+            [clojure.string :as str]
             [ajax.core :refer [GET]]
             [memegen-ui.config :as config]
             [memegen-ui.db :as db]
@@ -26,6 +27,11 @@
  :update-filtered-memes
  (fn [_ [_ filter-text]]
    {:dispatch-debounce [::filter [:filter-memes filter-text] 250]}))
+
+(re-frame/reg-event-fx
+ :update-image
+ (fn [_ _]
+   {:dispatch-debounce [::editor [:set-image-url] 250]}))
 
 ;; db events
 (re-frame/reg-event-db
@@ -104,11 +110,44 @@
          new-row-index (inc clicked-index)
          new-row (rows/create-selected-row new-row-index meme)]
      (ux/scroll-to-id (:name meme))
-     (assoc db
-            :filtered-meme-templates
-            (rows/insert-row new-row new-row-index memes)))))
+     (re-frame/dispatch [:update-image])
+     (-> db
+         (assoc :filtered-meme-templates
+                (rows/insert-row new-row new-row-index memes))
+         (assoc :meme-url (:blank meme))))))
 
 (re-frame/reg-event-db
  :selection-closed
  (fn [db _]
-   (assoc db :filtered-meme-templates (rows/remove-selected-row (:filtered-meme-templates db)))))
+   (-> db
+       (assoc :filtered-meme-templates (rows/remove-selected-row (:filtered-meme-templates db)))
+       (assoc :top-text "")
+       (assoc :bottom-text ""))))
+
+
+(re-frame/reg-event-db
+ :top-text-updated
+ (fn [db [_ top-text]]
+   (re-frame/dispatch [:update-image])
+   (assoc db :top-text top-text)))
+
+(re-frame/reg-event-db
+ :bottom-text-updated
+ (fn [db [_ bottom-text]]
+   (re-frame/dispatch [:update-image])
+   (assoc db :bottom-text bottom-text)))
+
+(defn clean-text
+  [text]
+  (let [replaced-text (str/replace text " " "_")]
+    (or (and (not (empty? replaced-text)) replaced-text)
+        "_")))
+
+(re-frame/reg-event-db
+ :set-image-url
+ (fn [db _]
+   (let [selected-row (rows/selected-row (:filtered-meme-templates db))
+         base-url (str/replace (:blank (:meme selected-row)) "_.jpg" "")
+         top-text (clean-text (:top-text db))
+         bottom-text (clean-text (:bottom-text db))]
+     (assoc db :meme-url (str base-url top-text "/" bottom-text ".jpg")))))

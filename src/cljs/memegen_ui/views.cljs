@@ -14,25 +14,37 @@
    [:div.meme-listing-view__name (:name meme)]])
 
 (defn meme-editor [meme]
-  [:div.meme-editor
-   [:div.col-xs-5
-    [:div.meme-editor__view
-     [:span.meme-editor__view__helper]
-     [:img.meme-editor__view__image {:src (:blank meme)
-                                                     :alt (:name meme)}]]]
-   [:div.col-xs-7
-    [:form
-     [:div.form-group
-      [:label "Top Text"]
-      [:input.form-control {:id "top-text"
-                            :autoFocus true}]]
-     [:div.form-group
-      [:label "Bottom Text"]
-      [:input.form-control {:id "bottom-text"}]]
-     [:button.btn.btn-default "Do It!"]]]])
+  (let [top-text (subscribe [:top-text])
+        bottom-text (subscribe [:bottom-text])
+        meme-url (subscribe [:meme-url])]
+    (fn []
+      [:div.meme-editor
+       [:div.col-xs-5
+        [:div.meme-editor__view
+         [:span.meme-editor__view__helper]
+         [:a {:href @meme-url
+              :target "_blank"}
+          [:img.meme-editor__view__image {:src @meme-url
+                                          :alt (:name meme)}]]]]
+       [:div.col-xs-7
+        [:form
+         [:div.form-group
+          [:label "Top Text"]
+          [:input.form-control {:id "top-text"
+                                :value @top-text
+                                :autoFocus true
+                                :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
+         [:div.form-group
+          [:label "Bottom Text"]
+          [:input.form-control {:id "bottom-text"
+                                :value @bottom-text
+                                :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
+         [:a {:href @meme-url
+              :target "_blank"} @meme-url]]]])))
 
 (defn meme-row-view [meme-row]
   (if (:selected meme-row)
+    ^{:key (str "row-selected")}
     [:div.row.meme-listing__selected-row
      [:div.pull-right.close {:on-click #(dispatch [:selection-closed])} "x"]
      [meme-editor (:meme meme-row)]]

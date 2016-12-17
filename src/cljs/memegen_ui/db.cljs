@@ -5,4 +5,7 @@
    :had-error? false
    :filter-text ""
    :available-meme-templates []
-   :filtered-meme-templates []})
+   :filtered-meme-templates []
+   :top-text ""
+   :bottom-text ""
+   :meme-url nil})

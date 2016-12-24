@@ -18,9 +18,10 @@ body {
   font-size: 30px;
   font-weight: 500;
   line-height: 1.1;
+  margin-bottom: 10px;
 }
 
-.close {
+.close-btn {
   font-size: 30px;
   color: #000;
   font-weight: bold;
@@ -62,11 +63,8 @@ body {
 }
 
 .meme-listing__selected-row {
-  background-color: #bbb;
-  padding: 20px;
-  padding-left: 0px;
   margin-bottom: 40px;
-  height: 400px;
+  min-height: 400px;
 
   animation-name: expandRow;
   animation-iteration-count: 1;
@@ -94,6 +92,13 @@ body {
   white-space: nowrap;
   text-align: center;
   margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+  .meme-editor__view {
+    height: 300px;      /* equals max image height */
+    width: 300px;
+  }
 }
 
 .meme-editor__view__helper {
@@ -140,13 +145,8 @@ body {
 .meme-listing-view__meme {
   height: 225px;      /* equals max image height */
   width: 225px;
-
   white-space: nowrap;
-
   text-align: center;
-  background-color: $light-grey;
-  border-radius: 5px;
-  border: 1px solid med-grey;
   margin: 0 auto;
 }
 
@@ -158,6 +158,6 @@ body {
 
 .meme-listing-view__meme__img {
   vertical-align: middle;
-  max-height: 200px;
-  max-width: 200px;
+  max-height: 225px;
+  max-width: 225px;
 }

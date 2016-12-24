@@ -6,6 +6,11 @@
               [memegen-ui.views :as views]
               [memegen-ui.config :as config]))
 
+(defn setup-browser-listeners []
+  (.addEventListener js/window
+                     "resize"
+                     (fn [] (re-frame/dispatch [:window-resizing])))
+  (re-frame/dispatch [:window-resizing]))
 
 (defn dev-setup []
   (when config/debug?
@@ -20,4 +25,5 @@
   (re-frame/dispatch-sync [:initialize-db])
   (re-frame/dispatch [:get-init-data])
   (dev-setup)
-  (mount-root))
+  (mount-root)
+  (setup-browser-listeners))

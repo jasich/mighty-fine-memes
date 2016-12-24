@@ -35,8 +35,8 @@
 
 (defn rowify
   "Places the memes into row structures"
-  [memes]
-  (let [tuples (partition 4 4 nil memes)]
+  [columns-per-row memes]
+  (let [tuples (partition columns-per-row columns-per-row nil memes)]
     (map-indexed (fn [index item]
                    (assoc {} :row-index index :memes item))
                  tuples)))
@@ -47,11 +47,11 @@
   (filter #(> (:rank %) 0) memes))
 
 (defn search
-  [filter-text memes]
+  [filter-text memes columns-per-row]
   (let [text (string/lower-case filter-text)
         filter-memes (if (empty? text) identity filter-by-rank)]
     (->> memes
          (rank-memes text)
          (filter-memes)
          (sort-memes)
-         (rowify))))
+         (rowify columns-per-row))))

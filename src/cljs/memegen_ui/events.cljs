@@ -33,6 +33,11 @@
  (fn [_ _]
    {:dispatch-debounce [::editor [:set-image-url] 250]}))
 
+(re-frame/reg-event-fx
+ :window-resizing
+ (fn [_ _]
+   {:dispatch-debounce [::window [:window-resized] 250]}))
+
 ;; db events
 (re-frame/reg-event-db
  :initialize-db
@@ -43,7 +48,8 @@
  :filter-memes
   (fn [db [_ filter-text]]
     (let [available-memes (:available-meme-templates db)
-          filtered-memes (search filter-text available-memes)]
+          columns-per-row (:columns-per-row db)
+          filtered-memes (search filter-text available-memes columns-per-row)]
       (-> db
           (assoc :filter-text filter-text)
           (assoc :filtered-meme-templates filtered-memes)))))
@@ -87,7 +93,8 @@
  :process-templates-reponse
  (fn [db [_ response]]
    (let [templates (format-api-search-response (js->clj response))
-         memes (search "" templates)]
+         columns-per-row (:columns-per-row db)
+         memes (search "" templates columns-per-row)]
      (-> db
          (assoc :loading? false)
          (assoc :initialized? true)
@@ -151,3 +158,17 @@
          top-text (clean-text (:top-text db))
          bottom-text (clean-text (:bottom-text db))]
      (assoc db :meme-url (str base-url top-text "/" bottom-text ".jpg")))))
+
+
+(re-frame/reg-event-db
+ :window-resized
+ (fn [db _]
+   (let [width (.-innerWidth js/window)
+         height (.-innerHeight js/window)
+         column-count (ux/columns-per-width width)
+         filtered-memes (search (:filter-text db) (:available-meme-templates db) column-count)]
+     (-> db
+         (assoc :window-width width)
+         (assoc :window-height height)
+         (assoc :columns-per-row column-count)
+         (assoc :filtered-meme-templates filtered-memes)))))

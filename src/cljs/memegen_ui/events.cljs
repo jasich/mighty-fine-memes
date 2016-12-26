@@ -4,7 +4,7 @@
             [ajax.core :refer [GET]]
             [memegen-ui.config :as config]
             [memegen-ui.db :as db]
-            [memegen-ui.search :refer [search]]
+            [memegen-ui.search :refer [search rowify]]
             [memegen-ui.rows :as rows]
             [memegen-ui.ux :as ux]))
 
@@ -36,7 +36,7 @@
 (re-frame/reg-event-fx
  :window-resizing
  (fn [_ _]
-   {:dispatch-debounce [::window [:window-resized] 250]}))
+   {:dispatch-debounce [::window [:window-resized] 100]}))
 
 ;; db events
 (re-frame/reg-event-db
@@ -116,7 +116,6 @@
          clicked-index (rows/row-index-of-meme meme memes)
          new-row-index (inc clicked-index)
          new-row (rows/create-selected-row new-row-index meme)]
-     (ux/scroll-to-id (:name meme))
      (re-frame/dispatch [:update-image])
      (-> db
          (assoc :filtered-meme-templates
@@ -166,9 +165,10 @@
    (let [width (.-innerWidth js/window)
          height (.-innerHeight js/window)
          column-count (ux/columns-per-width width)
-         filtered-memes (search (:filter-text db) (:available-meme-templates db) column-count)]
-     (-> db
-         (assoc :window-width width)
-         (assoc :window-height height)
-         (assoc :columns-per-row column-count)
-         (assoc :filtered-meme-templates filtered-memes)))))
+         filter-text (:filter-text db)
+         available-memes (:available-meme-templates db)]
+     (if (not= column-count (:columns-per-row db))
+       (-> db
+           (assoc :columns-per-row column-count)
+           (assoc :filtered-meme-templates (search filter-text available-memes column-count)))
+       db))))

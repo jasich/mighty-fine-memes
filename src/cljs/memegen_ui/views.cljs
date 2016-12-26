@@ -1,5 +1,7 @@
 (ns memegen-ui.views
-  (:require [re-frame.core :refer [subscribe dispatch]]))
+  (:require [re-frame.core :refer [subscribe dispatch]]
+            [memegen-ui.ux :as ux]
+            [reagent.core :as reagent]))
 
 
 ;;
@@ -13,38 +15,48 @@
                                         :alt (:name meme)}]]
    [:div.meme-listing-view__name (:name meme)]])
 
-(defn meme-editor [meme]
-  (let [top-text (subscribe [:top-text])
-        bottom-text (subscribe [:bottom-text])
-        meme-url (subscribe [:meme-url])]
-    (fn []
-      [:div.meme-editor.row
-       [:div.col-sm-6
-        [:div.meme-editor__view
-         [:span.meme-editor__view__helper]
-         [:a {:href @meme-url
-              :target "_blank"}
-          [:img.meme-editor__view__image {:src @meme-url
-                                          :alt (:name meme)}]]]]
-       [:div.col-sm-6
-        [:form
-         [:div.form-group
-          [:label "Top Text"]
-          [:input.form-control {:id "top-text"
-                                :value @top-text
-                                :autoFocus true
-                                :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
-         [:div.form-group
-          [:label "Bottom Text"]
-          [:input.form-control {:id "bottom-text"
-                                :value @bottom-text
-                                :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
-         [:div.actions
-          [:a.btn.btn-primary {:href @meme-url
-                               :role "button"
-                               :target "_blank"} "Open Link"]
-          [:button.btn.btn-default.pull-right {:type "button"
-                                    :on-click #(dispatch [:selection-closed])} "Close"]]]]])))
+(defn meme-editor
+  [meme]
+  (reagent/create-class
+   {:component-did-mount
+    #(ux/scroll-to-id "meme-editor")
+
+    :display-name "meme-editor"
+
+    :reagent-render
+    (fn [meme]
+      (let [top-text (subscribe [:top-text])
+            bottom-text (subscribe [:bottom-text])
+            meme-url (subscribe [:meme-url])]
+        (fn []
+          [:div.meme-editor {:id "meme-editor"}
+           [:h4 "Generate Meme"]
+           [:div.row
+            [:div.col-sm-6
+             [:div.meme-editor__view
+              [:span.meme-editor__view__helper]
+              [:a {:href @meme-url
+                   :target "_blank"}
+               [:img.meme-editor__view__image {:src @meme-url
+                                               :alt (:name meme)}]]]]
+            [:div.col-sm-6
+             [:div.form-group
+              [:label "Top Text"]
+              [:input.form-control {:id "top-text"
+                                    :value @top-text
+                                    :autoFocus true
+                                    :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
+             [:div.form-group
+              [:label "Bottom Text"]
+              [:input.form-control {:id "bottom-text"
+                                    :value @bottom-text
+                                    :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
+             [:div.meme-editor__actions
+              [:button.btn.btn-default.pull-left {:type "button"
+                                                  :on-click #(dispatch [:selection-closed])} "Done"]
+              [:a.btn.btn-primary.pull-right {:href @meme-url
+                                              :role "button"
+                                              :target "_blank"} "Preview"]]]]])))}))
 
 (defn meme-row-view [meme-row]
   (if (:selected meme-row)

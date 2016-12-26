@@ -66,10 +66,10 @@ body {
   margin-bottom: 40px;
   min-height: 400px;
 
-  animation-name: expandRow;
-  animation-iteration-count: 1;
-  animation-timing-function: ease-out;
-  animation-duration: 0.3s;
+  /* animation-name: expandRow; */
+  /* animation-iteration-count: 1; */
+  /* animation-timing-function: ease-out; */
+  /* animation-duration: 0.3s; */
 }
 
 @keyframes expandRow {
@@ -83,7 +83,7 @@ body {
 }
 
 .meme-editor {
-
+  padding: 10px 0px;
 }
 
 .meme-editor__view {
@@ -112,10 +112,10 @@ body {
   max-width: 100%;
   max-height: 100%;
 
-  animation-name: expandImage;
-  animation-iteration-count: 1;
-  animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
-  animation-duration: 1s;
+  /* animation-name: expandImage; */
+  /* animation-iteration-count: 1; */
+  /* animation-timing-function: cubic-bezier(0.4, 0, 1, 1); */
+  /* animation-duration: 1s; */
 }
 
 @keyframes expandImage {
@@ -126,6 +126,10 @@ body {
   100% {
     opacity: 1;
   }
+}
+
+.meme-editor__actions {
+  padding: 0 10px;
 }
 
 .meme-listing__meme-tuple:after {

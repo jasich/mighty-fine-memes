@@ -1,6 +1,6 @@
-# mighty-fine-memes
+![Mighty Fine Memes](logo.png)
 
-A front-end for the [memegen.link](https://memegen.link/) api written in ClojureScript using [re-frame](https://github.com/Day8/re-frame)
+A front-end for the [memegen.link](https://memegen.link/) API written in ClojureScript using [re-frame](https://github.com/Day8/re-frame)
 
 ## Development Mode
 

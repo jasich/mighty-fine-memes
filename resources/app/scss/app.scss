@@ -1,10 +1,5 @@
+@import "variables";
 @import "vendor/bootstrap/stylesheets/bootstrap";
-
-// Colors
-$primary-color: #4286f4;
-$light-grey: #EEEEEE;
-$med-grey: #DDDDDD;
-$dark-grey: #8C8C8C;
 
 
 body {
@@ -19,6 +14,7 @@ body {
   font-weight: 500;
   line-height: 1.1;
   margin-bottom: 10px;
+  font-family: $main-font;
 }
 
 .close-btn {
@@ -26,6 +22,15 @@ body {
   color: #000;
   font-weight: bold;
   cursor: pointer;
+}
+
+.form-group > label {
+  color: $dark-grey;
+  font-family: $main-font;
+}
+
+h3 {
+  font-family: $main-font;
 }
 
 // Loading View
@@ -118,6 +123,7 @@ input.form-control {
   text-transform: lowercase;
   color: $dark-grey;
   text-align: center;
+  font-family: $main-font;
 }
 
 .meme-listing-view__meme {

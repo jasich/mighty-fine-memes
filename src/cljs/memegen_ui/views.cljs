@@ -30,7 +30,7 @@
             meme-url (subscribe [:meme-url])]
         (fn []
           [:div.meme-editor {:id "meme-editor"}
-           [:h4 "Generate Meme"]
+           [:h3 "Generate Meme"]
            [:div.row
             [:div.col-sm-6
              [:div.meme-editor__view

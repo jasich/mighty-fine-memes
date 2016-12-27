@@ -42,3 +42,8 @@
  :meme-url
  (fn [db]
    (:meme-url db)))
+
+(re-frame/reg-sub
+ :meme-updating
+ (fn [db]
+   (:meme-updating db)))

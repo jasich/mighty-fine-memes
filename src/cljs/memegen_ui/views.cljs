@@ -27,36 +27,42 @@
     (fn [meme]
       (let [top-text (subscribe [:top-text])
             bottom-text (subscribe [:bottom-text])
-            meme-url (subscribe [:meme-url])]
+            meme-url (subscribe [:meme-url])
+            meme-updating (subscribe [:meme-updating])]
         (fn []
-          [:div.meme-editor {:id "meme-editor"}
-           [:h3 "Generate Meme"]
-           [:div.row
-            [:div.col-sm-6
-             [:div.meme-editor__view
-              [:span.meme-editor__view__helper]
-              [:a {:href @meme-url
-                   :target "_blank"}
-               [:img.meme-editor__view__image {:src @meme-url
-                                               :alt (:name meme)}]]]]
-            [:div.col-sm-6
-             [:div.form-group
-              [:label "Top Text"]
-              [:input.form-control {:id "top-text"
-                                    :value @top-text
-                                    :autoFocus true
-                                    :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
-             [:div.form-group
-              [:label "Bottom Text"]
-              [:input.form-control {:id "bottom-text"
-                                    :value @bottom-text
-                                    :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
-             [:div.meme-editor__actions
-              [:button.btn.btn-default.pull-left {:type "button"
-                                                  :on-click #(dispatch [:selection-closed])} "Done"]
-              [:a.btn.btn-primary.pull-right {:href @meme-url
-                                              :role "button"
-                                              :target "_blank"} "Preview"]]]]])))}))
+          (let [updating-meme @meme-updating]
+            [:div.meme-editor {:id "meme-editor"}
+             [:h3 (:name meme)]
+             [:div.row
+              [:div.col-sm-6
+               [:div.meme-editor__view
+                [:span.meme-editor__view__helper]
+                [:a {:href @meme-url
+                     :target "_blank"}
+                 [:img.meme-editor__view__image {:src @meme-url
+                                                 :alt (:name meme)}]]]]
+              [:div.col-sm-6
+               [:div.form-group
+                [:label "Top Text"]
+                [:input.form-control {:id "top-text"
+                                      :value @top-text
+                                      :autoFocus true
+                                      :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
+               [:div.form-group
+                [:label "Bottom Text"]
+                [:input.form-control {:id "bottom-text"
+                                      :value @bottom-text
+                                      :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
+               [:div.meme-editor__actions.clearfix
+                [:button.btn.btn-default.pull-left {:type "button"
+                                                    :on-click #(dispatch [:selection-closed])} "Done"]
+                [:a.btn.btn-primary.pull-right {:href @meme-url
+                                                :role "button"
+                                                :target "_blank"} "Preview"]]
+               (if updating-meme
+                 [:div.meme-editor__view__updating
+                  [:img {:src "images/ellipsis.gif"}]
+                  [:div.meme-editor__view__updating__text "updating..."]])]]]))))}))
 
 (defn meme-row-view [meme-row]
   (if (:selected meme-row)
@@ -106,8 +112,12 @@
 (defn main-panel []
   [:div
    [:div.row
-    [:div.col-sm-4
-     [:span.brand "Mighty Fine Memes"]]
+    [:div.col-sm-4.branding
+     [:span.brand "Mighty Fine Memes"]
+     [:span.brand-sub
+      [:span "powered by "]
+      [:a {:href "https://memegen.link/"
+           :target "_blank"} "memegen.link"]]]
     [:div.col-sm-8
      [filter-bar]]]
    [top-panel]])

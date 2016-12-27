@@ -135,17 +135,21 @@
  :top-text-updated
  (fn [db [_ top-text]]
    (re-frame/dispatch [:update-image])
-   (assoc db :top-text top-text)))
+   (-> db
+       (assoc :top-text top-text)
+       (assoc :meme-updating true))))
 
 (re-frame/reg-event-db
  :bottom-text-updated
  (fn [db [_ bottom-text]]
    (re-frame/dispatch [:update-image])
-   (assoc db :bottom-text bottom-text)))
+   (-> db
+       (assoc :bottom-text bottom-text)
+       (assoc :meme-updating true))))
 
 (defn clean-text
   [text]
-  (let [replaced-text (str/replace text " " "_")]
+  (let [replaced-text (str/replace (str/replace text " " "_") "?" "~q")]
     (or (and (not (empty? replaced-text)) replaced-text)
         "_")))
 
@@ -156,7 +160,9 @@
          base-url (str/replace (:blank (:meme selected-row)) "_.jpg" "")
          top-text (clean-text (:top-text db))
          bottom-text (clean-text (:bottom-text db))]
-     (assoc db :meme-url (str base-url top-text "/" bottom-text ".jpg")))))
+     (-> db
+         (assoc :meme-url (str base-url top-text "/" bottom-text ".jpg"))
+         (assoc :meme-updating false)))))
 
 
 (re-frame/reg-event-db

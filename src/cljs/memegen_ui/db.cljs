@@ -9,4 +9,5 @@
    :top-text ""
    :bottom-text ""
    :columns-per-row 4
+   :meme-updating false
    :meme-url nil})

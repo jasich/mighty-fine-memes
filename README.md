@@ -1,6 +1,6 @@
-# memegen-ui
+# mighty-fine-memes
 
-A [re-frame](https://github.com/Day8/re-frame) application designed to ... well, that part is up to you.
+A front-end for the [memegen.link](https://memegen.link/) api written in ClojureScript using [re-frame](https://github.com/Day8/re-frame)
 
 ## Development Mode
 
@@ -39,8 +39,19 @@ lein cljsbuild once min
 ### SASS Compilation
 Using [lein-sassy](https://github.com/vladh/lein-sassy)
 
-To compile files once, use lein sass once.
+Compile files once 
+```
+use lein sass once
+```
 
-To watch files for changes, use lein sass watch.
+Watch files for changes
 
-To remove generated files, run lein sass clean.
+```
+lein sass watch
+```
+
+Remove generated files, run 
+
+```
+lein sass clean
+```

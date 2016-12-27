@@ -4,9 +4,9 @@
             [ajax.core :refer [GET]]
             [memegen-ui.config :as config]
             [memegen-ui.db :as db]
-            [memegen-ui.search :refer [search rowify]]
+            [memegen-ui.search :refer [search]]
             [memegen-ui.rows :as rows]
-            [memegen-ui.ux :as ux]))
+            [memegen-ui.editor :as editor]))
 
 (defonce timeouts
   (atom {}))
@@ -75,19 +75,18 @@
          :error-handler api-error-handler})
    (assoc db :loading? true)))
 
-(defn convert-keys-to-keywords [raw-template]
-  (reduce (fn [mapped-template [key value]]
-                     (assoc mapped-template (keyword key) value))
-                   {}
-                   raw-template))
+(defn assoc-as-keyword [map [key value]]
+  (assoc map (keyword key) value))
 
-(defn format-api-search-response
-  [response]
-  (map (fn [search-item]
-         (let [raw-template (get search-item "template")
-               converted-template (convert-keys-to-keywords raw-template)]
-           (assoc converted-template :rank 0)))
-       response))
+(defn convert-to-keywords [raw-template]
+  (reduce assoc-as-keyword {} raw-template))
+
+(defn format-api-search-item [search-item]
+  (let [template (get search-item "template")]
+    (assoc (convert-to-keywords template) :rank 0)))
+
+(defn format-api-search-response [response]
+  (map format-api-search-item response))
 
 (re-frame/reg-event-db
  :process-templates-reponse
@@ -147,30 +146,20 @@
        (assoc :bottom-text bottom-text)
        (assoc :meme-updating true))))
 
-(defn clean-text
-  [text]
-  (let [replaced-text (str/replace (str/replace text " " "_") "?" "~q")]
-    (or (and (not (empty? replaced-text)) replaced-text)
-        "_")))
 
 (re-frame/reg-event-db
  :set-image-url
  (fn [db _]
-   (let [selected-row (rows/selected-row (:filtered-meme-templates db))
-         base-url (str/replace (:blank (:meme selected-row)) "_.jpg" "")
-         top-text (clean-text (:top-text db))
-         bottom-text (clean-text (:bottom-text db))]
+   (let [selected-row (rows/selected-row (:filtered-meme-templates db))]
      (-> db
-         (assoc :meme-url (str base-url top-text "/" bottom-text ".jpg"))
+         (assoc :meme-url (editor/create-meme (:meme selected-row) (:top-text db) (:bottom-text db)))
          (assoc :meme-updating false)))))
 
 
 (re-frame/reg-event-db
  :window-resized
  (fn [db _]
-   (let [width (.-innerWidth js/window)
-         height (.-innerHeight js/window)
-         column-count (ux/columns-per-width width)
+   (let [column-count (rows/columns-per-row (.-innerWidth js/window))
          filter-text (:filter-text db)
          available-memes (:available-meme-templates db)]
      (if (not= column-count (:columns-per-row db))

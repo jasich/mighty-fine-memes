@@ -36,3 +36,18 @@
 
 (defn create-selected-row [index meme]
   (assoc {} :row-index index :selected true :meme meme))
+
+(defn columns-per-row
+  [width]
+  (cond
+    (< width 768) 1
+    (< width 992) 2
+    :else 4))
+
+(defn rowify
+  "Places the memes into row structures"
+  [columns-per-row memes]
+  (let [tuples (partition columns-per-row columns-per-row nil memes)]
+    (map-indexed (fn [index item]
+                   (assoc {} :row-index index :memes item))
+                 tuples)))

@@ -27,10 +27,3 @@
         (.setTimeout js/window (fn []
                                  (.scrollTo js/window 0 move-to))
                      timeout)))))
-
-(defn columns-per-width
-  [width]
-  (cond
-    (< width 768) 1
-    (< width 992) 2
-    :else 4))

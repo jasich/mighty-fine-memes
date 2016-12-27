@@ -1,5 +1,6 @@
 (ns memegen-ui.search
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [memegen-ui.rows :as rows]))
 
 (defn count-keyword-matches
   "Counts how many times each word in the filter text appears in
@@ -33,14 +34,6 @@
     (reverse (sort-by :rank (sort-by :name memes)))
     (sort-by :name memes)))
 
-(defn rowify
-  "Places the memes into row structures"
-  [columns-per-row memes]
-  (let [tuples (partition columns-per-row columns-per-row nil memes)]
-    (map-indexed (fn [index item]
-                   (assoc {} :row-index index :memes item))
-                 tuples)))
-
 (defn filter-by-rank
   "Filters memes given :rank"
   [memes]
@@ -54,4 +47,4 @@
          (rank-memes text)
          (filter-memes)
          (sort-memes)
-         (rowify columns-per-row))))
+         (rows/rowify columns-per-row))))

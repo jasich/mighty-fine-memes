@@ -1,7 +1,7 @@
 (ns memegen-ui.views
   (:require [re-frame.core :refer [subscribe dispatch]]
-            [memegen-ui.ux :as ux]
-            [reagent.core :as reagent]))
+            [reagent.core :as reagent]
+            [memegen-ui.lib.ux :as ux]))
 
 
 ;;
@@ -75,7 +75,7 @@
        ^{:key (:name meme)} [meme-view meme])]))
 
 (defn meme-listing []
-  (let [meme-rows (subscribe [:filtered-meme-templates])]
+  (let [meme-rows (subscribe [:meme-listing])]
     (fn []
       [:div.meme-listing.row
        [:div.col-xs-12
@@ -102,12 +102,12 @@
           [meme-listing])))))
 
 (defn filter-bar []
-  (let [filter-text (subscribe [:filter-text])]
+  (let [filter-text (subscribe [:search-text])]
     (fn []
       [:input.form-control {:type "text"
                             :placeholder "Filter memes by name"
                             :value @filter-text
-                            :on-change #(dispatch [:filter-text-updated (-> % .-target .-value)])}])))
+                            :on-change #(dispatch [:search-text-updated (-> % .-target .-value)])}])))
 
 (defn main-panel []
   [:div

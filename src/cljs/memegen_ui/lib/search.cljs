@@ -1,22 +1,29 @@
-(ns memegen-ui.search
-  (:require [clojure.string :as string]
-            [memegen-ui.rows :as rows]))
+(ns memegen-ui.lib.search
+  (:require [clojure.string :as str]
+            [memegen-ui.lib.rows :as rows]))
+
+
+(defn count-for-keyword
+  "Increments count if the filter-term appears in the keyword"
+  [filter-term cur-count keyword]
+  (if (str/includes? keyword filter-term)
+    (inc cur-count)
+    cur-count))
+
+(defn sum-keyword-matches-for-term
+  "Sums the number of times a filter-term matches a keyword in keywords"
+  [keywords cur-count filter-term]
+  (let [count-keyword-fn (partial count-for-keyword filter-term)
+        term-in-keywords-count (reduce count-keyword-fn 0 keywords)]
+    (+ cur-count term-in-keywords-count)))
 
 (defn count-keyword-matches
   "Counts how many times each word in the filter text appears in
    the keywords for a meme"
-  [keywords filter-text]
-  (let [filter-words (map string/lower-case (string/split filter-text #"\s"))
-        lower-keywords (map string/lower-case keywords)]
-    (reduce (fn [filter-count filter-word]
-              (+ filter-count (reduce (fn [keyword-count keyword]
-                           (if (string/includes? keyword filter-word)
-                             (inc keyword-count)
-                             keyword-count))
-                         0
-                         lower-keywords)))
-            0
-            filter-words)))
+  [meme-keywords filter-text]
+  (let [filter-terms (map str/lower-case (str/split filter-text #"\s"))
+        keywords (map str/lower-case meme-keywords)]
+    (reduce (partial sum-keyword-matches-for-term keywords) 0 filter-terms)))
 
 (defn rank-memes
   "Add a meme ranking to each meme based on the given filter text"
@@ -39,9 +46,9 @@
   [memes]
   (filter #(> (:rank %) 0) memes))
 
-(defn search
+(defn search-memes
   [filter-text memes columns-per-row]
-  (let [text (string/lower-case filter-text)
+  (let [text (str/lower-case filter-text)
         filter-memes (if (empty? text) identity filter-by-rank)]
     (->> memes
          (rank-memes text)

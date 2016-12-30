@@ -1,5 +1,5 @@
-;; Based on https://github.com/GabrielDelepine/smooth-scroll/blob/main/smooth-scroll.js
-(ns memegen-ui.ux)
+;; scroll-to-id is based on https://github.com/GabrielDelepine/smooth-scroll/blob/main/smooth-scroll.js
+(ns memegen-ui.lib.ux)
 
 (def speed 500)
 (def moving-frequency 15)

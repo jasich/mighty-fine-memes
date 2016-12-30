@@ -3,9 +3,9 @@
 (def default-db
   {:initialized? false
    :had-error? false
-   :filter-text ""
-   :available-meme-templates []
-   :filtered-meme-templates []
+   :search-text ""
+   :memes []
+   :meme-listing []
    :top-text ""
    :bottom-text ""
    :columns-per-row 4

@@ -1,4 +1,4 @@
-(ns memegen-ui.rows)
+(ns memegen-ui.lib.rows)
 
 
 (defn insert-row [new-row index rows]
@@ -37,7 +37,17 @@
 (defn create-selected-row [index meme]
   (assoc {} :row-index index :selected true :meme meme))
 
+(defn insert-editor-row
+  "Inserts an editor row for the given meme into the meme-listing"
+  [meme meme-listing]
+  (let [memes (vec (remove-selected-row meme-listing))
+        clicked-index (row-index-of-meme meme memes)
+        new-row-index (inc clicked-index)
+        new-row (create-selected-row new-row-index meme)]
+    (insert-row new-row new-row-index memes)))
+
 (defn columns-per-row
+  "Determines the number of columns per row based on screen width"
   [width]
   (cond
     (< width 768) 1

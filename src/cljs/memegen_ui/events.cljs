@@ -15,7 +15,7 @@
 (re-frame/reg-fx
  :dispatch-debounce
  (fn [[id event-vec n]]
-   (js/clearTimeout (@timeouts id))
+   (js/clearTimeout (id @timeouts))
    (swap! timeouts assoc id
           (js/setTimeout (fn []
                            (re-frame/dispatch event-vec)

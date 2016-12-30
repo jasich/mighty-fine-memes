@@ -7,8 +7,9 @@
 ;;
 ;; Components
 (defn meme-view [meme]
-  [:div.col-md-3.col-xs-12.col-sm-6.meme-listing-view {:id (:name meme)
-                                    :on-click #(dispatch [:meme-selected meme]) }
+  [:div {:id (:name meme)
+         :class-name "col-md-3 col-xs-12 col-sm-6 meme-listing-view"
+         :on-click #(dispatch [:meme-selected meme]) }
    [:div.meme-listing-view__meme
     [:span.meme-listing-view__meme__helper]
     [:img.meme-listing-view__meme__img {:src (:blank meme)
@@ -31,48 +32,44 @@
             meme-updating (subscribe [:meme-updating])]
         (fn []
           (let [updating-meme @meme-updating]
-            [:div.meme-editor {:id "meme-editor"}
-             [:h3 (:name meme)]
-             [:div.row
-              [:div.col-sm-6
-               [:div.meme-editor__view
-                [:span.meme-editor__view__helper]
-                [:a {:href @meme-url
-                     :target "_blank"}
-                 [:img.meme-editor__view__image {:src @meme-url
-                                                 :alt (:name meme)}]]]]
-              [:div.col-sm-6
-               [:div.form-group
-                [:label "Top Text"]
-                [:input.form-control {:id "top-text"
-                                      :value @top-text
-                                      :autoFocus true
-                                      :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
-               [:div.form-group
-                [:label "Bottom Text"]
-                [:input.form-control {:id "bottom-text"
-                                      :value @bottom-text
-                                      :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
-               [:div.meme-editor__actions.clearfix
-                [:button.btn.btn-default.pull-left {:type "button"
-                                                    :on-click #(dispatch [:selection-closed])} "Done"]
-                [:a.btn.btn-primary.pull-right {:href @meme-url
-                                                :role "button"
-                                                :target "_blank"} "Preview"]]
-               (if updating-meme
-                 [:div.meme-editor__view__updating
-                  [:img {:src "images/ellipsis.gif"}]
-                  [:div.meme-editor__view__updating__text "updating..."]])]]]))))}))
+            [:div.row.meme-listing__selected-row {:id "selected-row"}
+             [:div.meme-editor {:id "meme-editor"}
+              [:h3 (:name meme)]
+              [:div.row
+               [:div.col-sm-6
+                [:div.meme-editor__view
+                 [:span.meme-editor__view__helper]
+                 [:a {:href @meme-url
+                      :target "_blank"}
+                  [:img.meme-editor__view__image {:src @meme-url
+                                                  :alt (:name meme)}]]]]
+               [:div.col-sm-6
+                [:div.form-group
+                 [:label "Top Text"]
+                 [:input.form-control {:id "top-text"
+                                       :value @top-text
+                                       :autoFocus true
+                                       :on-change #(dispatch [:top-text-updated (-> % .-target .-value)])}]]
+                [:div.form-group
+                 [:label "Bottom Text"]
+                 [:input.form-control {:id "bottom-text"
+                                       :value @bottom-text
+                                       :on-change #(dispatch [:bottom-text-updated (-> % .-target .-value)])}]]
+                [:div.meme-editor__actions.clearfix
+                 [:button.btn.btn-default.pull-left {:type "button"
+                                                     :on-click #(dispatch [:selection-closed])} "Done"]
+                 [:a.btn.btn-primary.pull-right {:href @meme-url
+                                                 :role "button"
+                                                 :target "_blank"} "Preview"]]
+                (if updating-meme
+                  [:div.meme-editor__view__updating
+                   [:img {:src "images/ellipsis.gif"}]
+                   [:div.meme-editor__view__updating__text "updating..."]])]]]]))))}))
 
-(defn meme-row-view [meme-row]
-  (if (:selected meme-row)
-    ^{:key (str "row-selected")}
-    [:div.row.meme-listing__selected-row {:id "selected-row"}
-     [meme-editor (:meme meme-row)]]
-    ^{:key (str "row-" (:row-index meme-row))}
-    [:div.row.meme-listing__meme-tuple
-     (for [meme (:memes meme-row)]
-       ^{:key (:name meme)} [meme-view meme])]))
+(defn meme-tuple [meme-row]
+  [:div.row.meme-listing__meme-tuple
+   (for [meme (:memes meme-row)]
+     ^{:key (:name meme)} [meme-view meme])])
 
 (defn meme-listing []
   (let [meme-rows (subscribe [:meme-listing])]
@@ -80,7 +77,9 @@
       [:div.meme-listing.row
        [:div.col-xs-12
         (for [meme-row @meme-rows]
-          (meme-row-view meme-row))]])))
+          (if (:selected meme-row)
+            ^{:key (str "row-" (:row-index meme-row))}[meme-editor (:meme meme-row)]
+            ^{:key (str "row-" (:row-index meme-row))}[meme-tuple meme-row]))]])))
 
 (defn loading-view []
   [:div.loading-view

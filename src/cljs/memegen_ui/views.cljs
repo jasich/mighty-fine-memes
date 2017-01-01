@@ -119,6 +119,7 @@
       [:input.form-control {:type "text"
                             :placeholder "Filter memes by name"
                             :value @filter-text
+                            :autoFocus true
                             :on-change #(dispatch [:search-text-updated (-> % .-target .-value)])}])))
 
 (defn main-panel []

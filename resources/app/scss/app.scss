@@ -147,6 +147,10 @@ input.form-control {
   cursor: pointer;
 }
 
+.meme-listing-view:hover {
+  background-color: $med-grey;
+}
+
 .meme-listing-view__name {
   text-transform: lowercase;
   color: $dark-grey;

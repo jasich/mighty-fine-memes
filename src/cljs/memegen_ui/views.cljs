@@ -22,6 +22,9 @@
    {:component-did-mount
     #(ux/scroll-to-id "meme-editor")
 
+    :component-will-unmount
+    #(ux/scroll-to-id (:name meme))
+
     :display-name "meme-editor"
 
     :reagent-render

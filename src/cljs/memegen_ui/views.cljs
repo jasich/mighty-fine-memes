@@ -43,7 +43,7 @@
                  [:span.meme-editor__view__helper]
                  [:a {:href @meme-url
                       :target "_blank"}
-                  [:img.meme-editor__view__image {:src @meme-url
+                  [:img.meme-editor__view__image {:src (str @meme-url "?preview=true")
                                                   :alt (:name meme)}]]]]
                [:div.col-sm-6
                 [:div.form-group

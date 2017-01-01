@@ -130,10 +130,9 @@
 
 (re-frame/reg-event-db
  :copy-meme-url
- (fn [db _]
-   (let [copy-status (ux/copy-text-from-elem "meme-url")]
-     (re-frame/dispatch [:dismiss-editor-message])
-     (assoc db :editor-message copy-status))))
+ (fn [db [_ copy-status]]
+   (re-frame/dispatch [:dismiss-editor-message])
+   (assoc db :editor-message copy-status)))
 
 (re-frame/reg-event-fx
  :dismiss-editor-message

@@ -67,7 +67,7 @@
 
                 [:div.meme-editor__actions.form-group.clearfix
                  [:button.btn.btn-primary {:type "button"
-                                           :on-click #(dispatch [:copy-meme-url])} "Copy Link"]
+                                           :on-click #(dispatch [:copy-meme-url (ux/copy-text-from-elem "meme-url")])} "Copy Link"]
                  [:button.btn.btn-default.pull-right {:type "button"
                                                       :on-click #(dispatch [:selection-closed])} "Done"]]
 

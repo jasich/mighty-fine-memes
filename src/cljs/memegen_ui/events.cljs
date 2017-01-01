@@ -4,7 +4,8 @@
             [memegen-ui.lib.api :as api]
             [memegen-ui.lib.editor :as editor]
             [memegen-ui.lib.rows :as rows]
-            [memegen-ui.lib.search :as search]))
+            [memegen-ui.lib.search :as search]
+            [memegen-ui.lib.ux :as ux]))
 
 
 ;; ------------------------------------------------------------------------
@@ -127,6 +128,23 @@
                                               (:bottom-text db)))
          (assoc :meme-updating false)))))
 
+(re-frame/reg-event-db
+ :copy-meme-url
+ (fn [db _]
+   (let [copy-status (ux/copy-text-from-elem "meme-url")]
+     (re-frame/dispatch [:dismiss-editor-message])
+     (assoc db :editor-message copy-status))))
+
+(re-frame/reg-event-fx
+ :dismiss-editor-message
+ (fn [_ _]
+   {:dispatch-debounce [::editor [:clear-editor-message] 2000]}))
+
+
+(re-frame/reg-event-db
+ :clear-editor-message
+ (fn [db _]
+   (assoc db :editor-message "")))
 
 ;; ------------------------------------------------------------------------
 ;; Window events

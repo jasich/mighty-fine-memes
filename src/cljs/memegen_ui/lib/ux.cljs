@@ -27,3 +27,14 @@
         (.setTimeout js/window (fn []
                                  (.scrollTo js/window 0 move-to))
                      timeout)))))
+
+(defn copy-text-from-elem
+  [elem-id]
+  (let [elem (.getElementById js/document elem-id)]
+    (.select elem)
+    (try
+      (if (.execCommand js/document "copy")
+        "Copied to Clipboard!!"
+        "Sorry Couldn't Copy")
+      (catch :default e
+        "Sorry Couldn't Copy"))))

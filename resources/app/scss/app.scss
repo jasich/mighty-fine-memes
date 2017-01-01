@@ -37,8 +37,12 @@ body {
   font-family: $main-font;
 }
 
-h3 {
+h1, h2, h3, h4, h5 {
   font-family: $main-font;
+}
+
+.cta {
+  margin-bottom: -12px;
 }
 
 // Loading View
@@ -93,6 +97,11 @@ h3 {
   margin: 0 auto;
 }
 
+.meme-editor__message {
+  font-family: $main-font;
+  text-align: center;
+}
+
 @media (max-width: 767px) {
   .meme-editor__view {
     height: 300px;      /* equals max image height */
@@ -127,7 +136,7 @@ input.form-control {
 
 
 .meme-editor__actions {
-  padding: 0 10px;
+
 }
 
 .meme-listing__meme-tuple:after {

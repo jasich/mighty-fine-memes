@@ -46,3 +46,8 @@
  :meme-updating
  (fn [db]
    (:meme-updating db)))
+
+(re-frame/reg-sub
+ :editor-message
+ (fn [db]
+   (:editor-message db)))

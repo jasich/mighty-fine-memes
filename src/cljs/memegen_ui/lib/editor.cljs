@@ -2,10 +2,24 @@
   (:require [clojure.string :as str]))
 
 
+(def replacement-chars {"?" "~q"
+                        "%" "~p"
+                        "#" "~h"
+                        "/" "~s"
+                        "''" "\""
+                        "_" "__"
+                        "-" "--"
+                        " " "_"})
+
+(defn sanitize-characters [user-input]
+  (reduce (fn [text [a b]] (str/replace text a b))
+          user-input
+          replacement-chars))
+
 (defn clean-text
   "Replaces characters in the given text with what the memegen API expects"
   [text]
-  (let [replaced-text (str/replace (str/replace text " " "_") "?" "~q")]
+  (let [replaced-text (sanitize-characters text)]
     (or (and (not (empty? replaced-text)) replaced-text)
         "_")))
 

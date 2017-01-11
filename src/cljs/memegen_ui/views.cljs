@@ -36,7 +36,8 @@
             editor-message (subscribe [:editor-message])]
         (fn []
           (let [updating-meme @meme-updating
-                message @editor-message]
+                message @editor-message
+                encoded-share-url (.encodeURIComponent js/window (str @meme-url "?share=true"))]
             [:div.row.meme-listing__selected-row {:id "selected-row"}
              [:div.meme-editor {:id "meme-editor"}
               [:h3 (:name meme)]
@@ -70,6 +71,19 @@
                                            :on-click #(dispatch [:copy-meme-url (ux/copy-text-from-elem "meme-url")])} "Copy Link"]
                  [:button.btn.btn-default.pull-right {:type "button"
                                                       :on-click #(dispatch [:selection-closed])} "Done"]]
+
+                [:div.meme-editor__social.clearfix
+                 [:div.meme-editor__social__button.pull-left
+                  [:a.btn.btn-default {:href (str "https://twitter.com/home?status=" encoded-share-url)
+                                       :target "_blank"}
+                   [:img.meme-editor__social__logo {:src "images/twitter.png"}]
+                   [:span.meme-editor__social__cta "Share on Twitter"]]]
+                 [:div.meme-editor__social__button.pull-right
+                  [:a.btn.btn-default {:href (str "https://www.facebook.com/sharer/sharer.php?u=" encoded-share-url)
+                                       :target "_blank"}
+                   [:img.meme-editor__social__logo {:src "images/facebook.png"}]
+                   [:span.meme-editor__social__cta "Share on Facebook"]]]]
+
 
                 [:div.meme-editor__message message]
 

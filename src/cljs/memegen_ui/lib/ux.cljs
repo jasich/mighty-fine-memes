@@ -8,7 +8,7 @@
   (+ (.. js/document -body -scrollTop) (.. js/document -documentElement -scrollTop)))
 
 (defn element-top [elem top]
-  (if (.-offsetParent elem)
+  (if (and elem (.-offsetParent elem))
     (let [client-top (or (.-clientTop elem) 0)
           offset-top (.-offsetTop elem)]
       (+ top client-top offset-top (element-top (.-offsetParent elem) top)))

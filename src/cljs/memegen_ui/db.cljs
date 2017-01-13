@@ -11,4 +11,5 @@
    :columns-per-row 4
    :meme-updating false
    :meme-url nil
+   :meme-data-url nil
    :editor-message ""})

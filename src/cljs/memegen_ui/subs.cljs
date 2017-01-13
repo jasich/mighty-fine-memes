@@ -51,3 +51,11 @@
  :editor-message
  (fn [db]
    (:editor-message db)))
+
+
+(re-frame/reg-sub
+ :meme-data-url
+ (fn [db]
+   (if (empty? (:meme-data-url db))
+     (:meme-url db)
+     (:meme-data-url db))))

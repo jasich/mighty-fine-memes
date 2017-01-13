@@ -5,7 +5,10 @@
             [memegen-ui.lib.editor :as editor]
             [memegen-ui.lib.rows :as rows]
             [memegen-ui.lib.search :as search]
-            [memegen-ui.lib.ux :as ux]))
+            [memegen-ui.lib.ux :as ux]
+            [dandy-roll.core :as dr]
+            [dandy-roll.canvas :refer [data-url]]
+            [dandy-roll.promise :refer [then]]))
 
 
 ;; ------------------------------------------------------------------------
@@ -104,18 +107,20 @@
 (re-frame/reg-event-db
  :top-text-updated
  (fn [db [_ top-text]]
-   (re-frame/dispatch [:update-image])
+   (re-frame/dispatch [:foo-bar])
    (-> db
        (assoc :top-text top-text)
-       (assoc :meme-updating true))))
+       ;; (assoc :meme-updating true)
+       )))
 
 (re-frame/reg-event-db
  :bottom-text-updated
  (fn [db [_ bottom-text]]
-   (re-frame/dispatch [:update-image])
+   (re-frame/dispatch [:foo-bar])
    (-> db
        (assoc :bottom-text bottom-text)
-       (assoc :meme-updating true))))
+       ;; (assoc :meme-updating true)
+       )))
 
 
 (re-frame/reg-event-db
@@ -144,6 +149,28 @@
  :clear-editor-message
  (fn [db _]
    (assoc db :editor-message "")))
+
+(re-frame/reg-event-db
+ :foo-bar
+ (fn [db _]
+   (let [meme-url (:meme-url db)
+         top-text (:top-text db)
+         bottom-text (:bottom-text db)]
+     (dr/watermark meme-url
+                   (dr/with-text top-text 42 "Impact" "#fff" dr/center-top)
+                   (dr/with-text bottom-text 42 "Impact" "#fff" dr/center-bottom)
+                   (fn [{:keys [promise canvas]}]
+                     (-> (then promise data-url)
+                         (then (fn [url]
+                                 (re-frame/dispatch [:zoop url]))))))
+     db)))
+
+
+(re-frame/reg-event-db
+ :zoop
+ (fn [db [_ url]]
+   (assoc db :meme-data-url url)))
+
 
 ;; ------------------------------------------------------------------------
 ;; Window events

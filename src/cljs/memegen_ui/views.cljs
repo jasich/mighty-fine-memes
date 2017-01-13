@@ -1,7 +1,8 @@
 (ns memegen-ui.views
   (:require [re-frame.core :refer [subscribe dispatch]]
             [reagent.core :as reagent]
-            [memegen-ui.lib.ux :as ux]))
+            [memegen-ui.lib.ux :as ux]
+            [dandy-roll.core :as dr]))
 
 
 ;;
@@ -29,6 +30,7 @@
       (let [top-text (subscribe [:top-text])
             bottom-text (subscribe [:bottom-text])
             meme-url (subscribe [:meme-url])
+            meme-data-url (subscribe [:meme-data-url])
             meme-updating (subscribe [:meme-updating])
             editor-message (subscribe [:editor-message])]
         (fn []
@@ -44,8 +46,9 @@
                  [:span.meme-editor__view__helper]
                  [:a {:href @meme-url
                       :target "_blank"}
-                  [:img.meme-editor__view__image {:src (str @meme-url "?preview=true")
-                                                  :alt (:name meme)}]]]]
+                  [:img.meme-editor__view__image {:src @meme-data-url
+                                                  :alt (:name meme)}]
+                  ]]]
                [:div.col-sm-6
                 [:div.form-group
                  [:label "Top Text"]

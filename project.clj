@@ -4,7 +4,7 @@
                  [reagent "0.6.0"]
                  [re-frame "0.9.1"]
                  [cljs-ajax "0.5.8"]
-                 [brianium/dandy-roll "0.13"]]
+                 [brianium/dandy-roll "0.21"]]
 
   :plugins [[lein-cljsbuild "1.1.4"]]
 

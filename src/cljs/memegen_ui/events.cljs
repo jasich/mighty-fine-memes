@@ -1,5 +1,6 @@
 (ns memegen-ui.events
   (:require [re-frame.core :as re-frame]
+            [clojure.string :as str]
             [memegen-ui.db :as db]
             [memegen-ui.lib.api :as api]
             [memegen-ui.lib.editor :as editor]
@@ -107,7 +108,7 @@
 (re-frame/reg-event-db
  :top-text-updated
  (fn [db [_ top-text]]
-   (re-frame/dispatch [:foo-bar])
+   (re-frame/dispatch [:update-meme-image])
    (-> db
        (assoc :top-text top-text)
        ;; (assoc :meme-updating true)
@@ -116,7 +117,7 @@
 (re-frame/reg-event-db
  :bottom-text-updated
  (fn [db [_ bottom-text]]
-   (re-frame/dispatch [:foo-bar])
+   (re-frame/dispatch [:update-meme-image])
    (-> db
        (assoc :bottom-text bottom-text)
        ;; (assoc :meme-updating true)
@@ -151,23 +152,22 @@
    (assoc db :editor-message "")))
 
 (re-frame/reg-event-db
- :foo-bar
+ :update-meme-image
  (fn [db _]
    (let [meme-url (:meme-url db)
-         top-text (:top-text db)
-         bottom-text (:bottom-text db)]
+         top-text (str/upper-case (:top-text db))
+         bottom-text (str/upper-case (:bottom-text db))
+         stroked-top (dr/center-top {:strokeStyle "black" :lineWidth 3})
+         stroked-bottom (dr/center-bottom {:strokeStyle "black" :lineWidth 3})]
      (dr/watermark meme-url
-                   (dr/with-text top-text 42 "Impact" "#fff" dr/center-top)
-                   (dr/with-text bottom-text 42 "Impact" "#fff" dr/center-bottom)
-                   (fn [{:keys [promise canvas]}]
-                     (-> (then promise data-url)
-                         (then (fn [url]
-                                 (re-frame/dispatch [:zoop url]))))))
-     db)))
+                   (dr/with-text top-text 72 "Impact" "#fff" stroked-top)
+                   (dr/with-text bottom-text 62 "Impact" "#fff" stroked-bottom)
+                   (dr/to-data-url #(re-frame/dispatch [:update-meme-url %]))))
+     db))
 
 
 (re-frame/reg-event-db
- :zoop
+ :update-meme-url
  (fn [db [_ url]]
    (assoc db :meme-data-url url)))
 

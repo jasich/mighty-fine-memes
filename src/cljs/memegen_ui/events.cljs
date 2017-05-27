@@ -121,7 +121,10 @@
 (re-frame/reg-event-db
  :set-image-url
  (fn [db _]
-   (let [selected-row (rows/selected-row (:meme-listing db))]
+   (let [selected-row (rows/selected-row (:meme-listing db))
+         top-text     (:top-text db)
+         bottom-text  (:bottom-text db)]
+     (api/meme-complete top-text bottom-text)
      (-> db
          (assoc :meme-url (editor/create-meme (:meme selected-row)
                                               (:top-text db)

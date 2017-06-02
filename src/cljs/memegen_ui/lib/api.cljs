@@ -5,7 +5,7 @@
 
 (defn meme-complete [top-text bottom-text]
   (GET
-    (str "http://memecomplete.herokuapp.com/api/memes/?text=" top-text "/" bottom-text "&source=mightyfinememes&context=http://memegen.link/")
+    (str "https://memecomplete.com/api/memes/?text=" top-text "/" bottom-text "&source=mightyfinememes")
     {:handler #()
      :error-handler #()}))
 

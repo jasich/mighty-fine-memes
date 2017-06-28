@@ -3,9 +3,9 @@
             [ajax.core :refer [GET]]
             [memegen-ui.config :as config]))
 
-(defn meme-complete [top-text bottom-text]
+(defn meme-complete [top-text bottom-text image-url]
   (GET
-    (str "http://memecomplete.herokuapp.com/api/memes/?text=" top-text "/" bottom-text "&source=mightyfinememes&context=http://memegen.link/")
+    (str "https://memecomplete.com/api/memes/?source=mightyfinememes&text=" top-text " / " bottom-text "&context=" image-url)
     {:handler #()
      :error-handler #()}))
 

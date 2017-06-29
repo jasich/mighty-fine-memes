@@ -124,7 +124,6 @@
    (let [selected-row (rows/selected-row (:meme-listing db))
          top-text     (:top-text db)
          bottom-text  (:bottom-text db)]
-     (api/meme-complete top-text bottom-text)
      (-> db
          (assoc :meme-url (editor/create-meme (:meme selected-row)
                                               (:top-text db)
@@ -134,8 +133,12 @@
 (re-frame/reg-event-db
  :copy-meme-url
  (fn [db [_ copy-status]]
+  (let [top-text    (:top-text db)
+        bottom-text (:bottom-text db)
+        image-url    (:meme-url db)]
+   (api/meme-complete top-text bottom-text image-url)
    (re-frame/dispatch [:dismiss-editor-message])
-   (assoc db :editor-message copy-status)))
+   (assoc db :editor-message copy-status))))
 
 (re-frame/reg-event-fx
  :dismiss-editor-message

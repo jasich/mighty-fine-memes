@@ -6,3 +6,4 @@
 out
 .lein-repl-history
 .nrepl-port
+.sass-cache

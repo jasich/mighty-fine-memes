@@ -29,7 +29,6 @@ Wait a bit, then browse to [http://localhost:3449](http://localhost:3449).
 
 ## Production Build
 
-
 To compile clojurescript to javascript:
 
 ```
@@ -37,13 +36,14 @@ lein clean
 lein cljsbuild once min
 ```
 
-
 ### SASS Compilation
+
 Using [lein-sassy](https://github.com/vladh/lein-sassy)
 
 Compile files once
+
 ```
-use lein sass once
+lein sass once
 ```
 
 Watch files for changes
